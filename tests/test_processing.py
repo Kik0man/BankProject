@@ -52,8 +52,8 @@ def test_sort_by_date_invalid_formats(invalid_date_format):
 
 
 @pytest.mark.parametrize("invalid_data", [
-    [{"date": None}],                  # None вместо даты
-    [{"date": 12345}],                 # Число вместо даты
+    [{"date": None}],
+    [{"date": 12345}],
 ])
 def test_sort_by_date_invalid_data_types(invalid_data):
     """Тестирование некорректных типов данных"""

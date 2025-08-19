@@ -26,7 +26,7 @@ def test_get_mask_account_blank_string():
 
 
 def test_get_mask_card_number_int_type():
-    assert get_mask_card_number(5555555566667777) == "5555 55** **** 7777"
+    assert get_mask_card_number(5555555566667776) == "5555 55** **** 7776"
 
 
 def test_get_mask_account_int_type():

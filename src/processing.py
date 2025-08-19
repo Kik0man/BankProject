@@ -12,7 +12,7 @@ def filter_by_state(transactions: list[dict[str, Any]], state: str = "EXECUTED")
 
 
 def sort_by_date(transactions: list[dict[str, Any]], reverse: bool = True) -> list[dict[str, Any]]:
-    """Сортирует список словарей по дате, в зависимости от значения reverse"""
+    """Сортирует список словарей по дате, в зависимости от значения reverse, по умолчанию True"""
 
     # Проверяем наличие ключа 'date' во всех элементах
     for transaction in transactions:

@@ -2,7 +2,7 @@ def get_mask_card_number(card_numbers: str) -> str:
     """Функция маскирует первые 6 и последние 4 цифры карты пользователя"""
 
     card_numbers = str(card_numbers)
-    # Удаляем все пробелы, если они есть
+    # Удаляем все пробелы, если таковые есть
     cleaned_number = card_numbers.replace(" ", "")
     if not cleaned_number.isdigit():
         raise ValueError("Номер карты должен содержать только цифры")

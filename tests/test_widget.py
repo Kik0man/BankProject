@@ -48,7 +48,6 @@ def test_get_date_valid_formats(input_date, expected):
     "2024-13-45T02:26:18.671407",      # Несуществующая дата
 ])
 def test_get_date_invalid_formats(invalid_date):
-    """Тестирование некорректных форматов даты"""
     with pytest.raises((ValueError, IndexError)):
         get_date(invalid_date)
 

@@ -24,7 +24,7 @@ def masked_account_info():
 @pytest.fixture
 def sample_card_data():
     return [("Visa 1234567812345678", "Visa 1234 56** **** 5678"),
-            ("MasterCard 1111222233334444", "MasterCard 1111 22** **** 4444")]
+            ("MasterCard 1111222233334443", "MasterCard 1111 22** **** 4443")]
 
 
 @pytest.fixture

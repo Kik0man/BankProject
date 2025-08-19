@@ -71,10 +71,4 @@ def get_date(date_str: str) -> str:
     if month_int in [4, 6, 9, 11] and day_int > 30:  # Апрель, Июнь, Сентябрь, Ноябрь
         raise ValueError("Некорректный день для этого месяца")
 
-    if month_int == 2:  # Февраль
-        # Упрощенная проверка високосного года
-        is_leap = (year_int % 4 == 0 and year_int % 100 != 0) or (year_int % 400 == 0)
-        if (is_leap and day_int > 29) or (not is_leap and day_int > 28):
-            raise ValueError("Некорректный день для февраля")
-
     return f"{day}.{month}.{year}"
