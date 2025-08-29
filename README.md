@@ -39,5 +39,33 @@ pip install -r requirements.txt
 
 По лицензии пока нет информации, так как еще не дошли до этого.
 
+# Новый модуль обработки банковских транзакций
 
+Новый модуль предоставляет функции для работы с банковскими операциями.
+
+## Функции
+Всего было добавлено 3 функции: filter_by_currency, 
+transaction_descriptions(transactions),
+transaction_descriptions(transactions)
+
+### filter_by_currency(transactions, currency_code)
+Фильтрует транзакции по валюте.
+```
+usd_transactions = filter_by_currency(transactions, "USD")
+for transaction in usd_transactions:
+    print(transaction['id'])
+```
+### transaction_descriptions(transactions)
+Извлекает описания операций.
+```
+descriptions = transaction_descriptions(transactions)
+for description in descriptions:
+    print(description)
+```
+### card_number_generator(start, end)
+Генерирует номера карт в заданном диапазоне.
+```
+for card in card_number_generator(1, 5):
+    print(card)
+```
 
