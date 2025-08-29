@@ -20,7 +20,7 @@ def filter_by_currency(transactions: list[dict[str, Any]], currency_code: str = 
 
 def transaction_descriptions(transactions: list[dict[str, Any]]) -> Iterator[str]:
     """Генератор, который возвращает описание каждой операции из списка транзакций.
-    Пропускает транзакции без описания."""
+    Пропускает транзакции без описания. """
     for transaction in transactions:
         try:
             if isinstance(transaction, dict) and "description" in transaction:

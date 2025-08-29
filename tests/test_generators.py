@@ -7,7 +7,7 @@ from src.generators import card_number_generator, filter_by_currency, transactio
 
 # Тесты для filter_by_currency
 def test_filter_usd_transactions(currency_test_transactions: list[dict[str, Any]]) -> None:
-    """Тестирование фильтрации USD транзакций."""
+    """Тестирование фильтрации USD транзакций. """
     result: list[dict[str, Any]] = list(filter_by_currency(currency_test_transactions, "USD"))
 
     assert len(result) == 3

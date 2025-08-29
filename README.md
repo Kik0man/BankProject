@@ -68,4 +68,3 @@ for description in descriptions:
 for card in card_number_generator(1, 5):
     print(card)
 ```
-
