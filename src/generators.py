@@ -1,7 +1,10 @@
-from typing import Any, Generator, Iterator
+from typing import Any, Generator, Iterator, Optional
 
 
-def filter_by_currency(transactions: list[dict[str, Any]], currency_code: str = "USD") -> Iterator[dict[str, Any]]:
+def filter_by_currency(
+    transactions: list[dict[str, Any]],
+    currency_code: str = "USD"
+) -> Iterator[Optional[dict[str, Any]]]:
     """Фильтрует транзакции по валюте операции.
     Args:
     transactions: список словарей с транзакциями
@@ -18,9 +21,9 @@ def filter_by_currency(transactions: list[dict[str, Any]], currency_code: str = 
                 yield transaction
 
 
-def transaction_descriptions(transactions: list[dict[str, Any]]) -> Iterator[str]:
+def transaction_descriptions(transactions: list[dict[str, Any]]) -> Generator[str, None, None]:
     """Генератор, который возвращает описание каждой операции из списка транзакций.
-    Пропускает транзакции без описания. """
+    Пропускает транзакции без описания."""
     for transaction in transactions:
         try:
             if isinstance(transaction, dict) and "description" in transaction:
@@ -31,7 +34,7 @@ def transaction_descriptions(transactions: list[dict[str, Any]]) -> Iterator[str
             continue
 
 
-def card_number_generator(start: int, end: int) -> Generator[str]:
+def card_number_generator(start: int, end: int) -> Generator[str, None, None]:
     """Генератор номеров банковских карт в заданном диапазоне."""
     # 1. Проверяем корректность входных параметров
     if start < 1:
