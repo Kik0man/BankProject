@@ -330,4 +330,3 @@ def test_decorator_with_none_filename(capsys: Any) -> None:
 
     assert "explicit_none_func started" in console_output
     assert "explicit_none_func ok. Result: 42" in console_output
-
