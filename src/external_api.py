@@ -9,29 +9,62 @@ load_dotenv()
 
 def get_amount_in_rubles(transaction: Dict[str, Any]) -> Optional[float]:
     """
-    Возвращает сумму транзакции в рублях.
+    Возвращает сумму транзакции в рублях для реальной структуры из operations.json.
+    Args:
+        transaction: Словарь с данными транзакции из operations.json
     """
     try:
-        # Извлекаем сумму и валюту из реальной структуры транзакции
-        amount = transaction.get("amount")
-        currency = transaction.get("currency", "RUB").upper()
-
-        # Проверяем наличие и корректность суммы
-        if amount is None:
-            print("❌ Сумма транзакции отсутствует")
+        # Проверяем, что транзакция не пустая
+        if not transaction:
+            print("❌ Пустая транзакция")
             return None
 
-        if not isinstance(amount, (int, float)):
-            print(f"❌ Некорректный тип суммы: {type(amount)}")
+        # Извлекаем сумму и валюту из реальной структуры operations.json
+        if "operationAmount" not in transaction:
+            print("❌ Отсутствует поле 'operationAmount' в транзакции")
+            return None
+
+        operation_amount = transaction["operationAmount"]
+
+        # Извлекаем сумму (она хранится как строка!)
+        if "amount" not in operation_amount:
+            print("❌ Отсутствует поле 'amount' в operationAmount")
+            return None
+
+        amount_str = operation_amount["amount"]
+
+        # Конвертируем строку в число
+        try:
+            amount = float(amount_str)
+        except (ValueError, TypeError):
+            print(f"❌ Некорректный формат суммы: '{amount_str}'")
             return None
 
         if amount < 0:
             print(f"❌ Отрицательная сумма: {amount}")
             return None
 
+        # Извлекаем валюту из вложенной структуры
+        if "currency" not in operation_amount:
+            print("❌ Отсутствует поле 'currency' в operationAmount")
+            return None
+
+        currency_data = operation_amount["currency"]
+
+        # Обрабатываем структуру валюты (словарь с полями 'name' и 'code')
+        if not isinstance(currency_data, dict):
+            print(f"❌ Некорректный формат валюты: {type(currency_data)}")
+            return None
+
+        if "code" not in currency_data:
+            print("❌ Отсутствует поле 'code' в currency")
+            return None
+
+        currency = currency_data["code"].upper()
+
         # Если валюта уже рубли, возвращаем как есть
         if currency == "RUB":
-            return float(amount)
+            return amount
 
         # Если валюта USD или EUR, конвертируем
         if currency in ["USD", "EUR"]:
@@ -52,11 +85,7 @@ def get_amount_in_rubles(transaction: Dict[str, Any]) -> Optional[float]:
 
 def convert_currency_apilayer(amount: float, from_currency: str, to_currency: str) -> Optional[float]:
     """
-    Конвертирует сумму из одной валюты в другую используя Exchange Rates Data API от apilayer.com.
-    Args:
-        amount: Сумма для конвертации
-        from_currency: Исходная валюта (USD, EUR)
-        to_currency: Целевая валюта (RUB)
+    Конвертирует сумму из одной валюты в другую используя Exchange Rates Data API.
     """
     try:
         # Получаем API ключ из .env файла
@@ -64,19 +93,24 @@ def convert_currency_apilayer(amount: float, from_currency: str, to_currency: st
 
         if not api_key:
             print("❌ API ключ не найден в .env файле")
+            print("   Добавьте EXCHANGE_RATE_API_KEY=ваш_ключ в файл .env")
             return None
+
+        print(f"🔑 API ключ загружен: {'*' * 10}{api_key[-4:]}")
 
         # Формируем URL для получения текущих курсов
         url = f"https://api.apilayer.com/exchangerates_data/latest?base={from_currency}&symbols={to_currency}"
 
         headers = {"apikey": api_key}
 
+        print(f"🌐 Отправка запроса к API: {from_currency} -> {to_currency}")
+
         # Отправляем GET запрос
         response = requests.get(url, headers=headers, timeout=10)
 
         # Проверяем успешность запроса
         if response.status_code != 200:
-            print(f"❌ HTTP ошибка {response.status_code}: {response.text}")
+            print(f"❌ HTTP ошибка {response.status_code}: {response.text[:100]}...")
             return None
 
         data = response.json()
