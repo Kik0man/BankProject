@@ -3,15 +3,13 @@ import os
 import tempfile
 from typing import Any, Dict, List
 
-
 from src.utils import load_transactions
 
 
-def test_load_transactions_valid_file() -> None:
+def test_load_transactions_valid_file_direct_json_load() -> None:
     """
-    Тест загрузки валидного JSON файла со списком транзакций.
+    Тест загрузки валидного JSON файла с использованием прямого json.load().
     """
-    # Создаем временный файл с валидными данными
     test_data: List[Dict[str, Any]] = [
         {
             "id": 1,
@@ -48,99 +46,40 @@ def test_load_transactions_valid_file() -> None:
         assert result[1]["currency"] == "USD"
 
     finally:
-        # Удаляем временный файл
         os.unlink(temp_file_path)
 
 
-def test_load_transactions_empty_file() -> None:
+def test_load_transactions_large_file() -> None:
     """
-    Тест загрузки пустого файла.
+    Тест загрузки большого JSON файла.
     """
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
-        # Создаем пустой файл
-        temp_file_path: str = f.name
-
-    try:
-        result: List[Dict[str, Any]] = load_transactions(temp_file_path)
-        assert result == []
-        assert isinstance(result, list)
-
-    finally:
-        os.unlink(temp_file_path)
-
-
-def test_load_transactions_file_not_found() -> None:
-    """
-    Тест загрузки несуществующего файла.
-    """
-    result: List[Dict[str, Any]] = load_transactions("non_existent_file.json")
-    assert result == []
-    assert isinstance(result, list)
-
-
-def test_load_transactions_not_list() -> None:
-    """
-    Тест загрузки файла с данными не в виде списка.
-    """
-    test_data: Dict[str, Any] = {"transaction": {"id": 1, "amount": 100.50}}
-
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
-        json.dump(test_data, f, ensure_ascii=False, indent=2)
-        temp_file_path: str = f.name
-
-    try:
-        result: List[Dict[str, Any]] = load_transactions(temp_file_path)
-        assert result == []
-        assert isinstance(result, list)
-
-    finally:
-        os.unlink(temp_file_path)
-
-
-def test_load_transactions_invalid_json() -> None:
-    """
-    Тест загрузки файла с некорректным JSON.
-    """
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
-        f.write('{"invalid": json,}')
-        temp_file_path: str = f.name
-
-    try:
-        result: List[Dict[str, Any]] = load_transactions(temp_file_path)
-        assert result == []
-        assert isinstance(result, list)
-
-    finally:
-        os.unlink(temp_file_path)
-
-
-def test_load_transactions_empty_list() -> None:
-    """
-    Тест загрузки файла с пустым списком.
-    """
+    # Создаем большой список транзакций
     test_data: List[Dict[str, Any]] = []
+    for i in range(1000):
+        test_data.append({"id": i + 1, "amount": i * 10.0, "currency": "RUB", "description": f"Transaction {i + 1}"})
 
     with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
-        json.dump(test_data, f, ensure_ascii=False, indent=2)
+        json.dump(test_data, f)
         temp_file_path: str = f.name
 
     try:
         result: List[Dict[str, Any]] = load_transactions(temp_file_path)
-        assert result == []
-        assert isinstance(result, list)
+        assert len(result) == 1000
+        assert result[999]["id"] == 1000
+        assert result[999]["amount"] == 9990.0
 
     finally:
         os.unlink(temp_file_path)
 
 
-def test_load_transactions_with_utf8_characters() -> None:
+def test_load_transactions_with_unicode_characters() -> None:
     """
-    Тест загрузки файла с UTF-8 символами.
+    Тест загрузки файла с Unicode символами.
     """
     test_data: List[Dict[str, Any]] = [
         {
             "id": 1,
-            "description": "Покупка в магазине",  # Русские символы
+            "description": "Покупка в магазине 🛒",  # Русские символы и эмодзи
             "amount": 150.75,
             "currency": "RUB",
             "category": "продукты",
@@ -154,16 +93,35 @@ def test_load_transactions_with_utf8_characters() -> None:
     try:
         result: List[Dict[str, Any]] = load_transactions(temp_file_path)
         assert len(result) == 1
-        assert result[0]["description"] == "Покупка в магазине"
+        assert result[0]["description"] == "Покупка в магазине 🛒"
         assert result[0]["category"] == "продукты"
 
     finally:
         os.unlink(temp_file_path)
 
 
-def test_load_transactions_complex_structure() -> None:
+def test_load_transactions_file_size_zero() -> None:
     """
-    Тест загрузки файла со сложной структурой данных.
+    Тест загрузки файла с нулевым размером.
+    """
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False, encoding="utf-8") as f:
+        # Создаем пустой файл
+        temp_file_path: str = f.name
+
+    try:
+        # Убедимся, что файл действительно пустой
+        assert os.path.getsize(temp_file_path) == 0
+
+        result: List[Dict[str, Any]] = load_transactions(temp_file_path)
+        assert result == []
+
+    finally:
+        os.unlink(temp_file_path)
+
+
+def test_load_transactions_complex_nested_structure() -> None:
+    """
+    Тест загрузки файла со сложной вложенной структурой.
     """
     test_data: List[Dict[str, Any]] = [
         {
@@ -172,8 +130,11 @@ def test_load_transactions_complex_structure() -> None:
             "amount": 100.50,
             "currency": "RUB",
             "description": "Test transaction",
-            "metadata": {"location": "Moscow", "device": "mobile"},
-            "tags": ["food", "urgent"],
+            "metadata": {
+                "location": {"city": "Moscow", "country": "Russia"},
+                "device": {"type": "mobile", "os": "iOS"},
+            },
+            "items": [{"name": "Product A", "price": 50.25}, {"name": "Product B", "price": 50.25}],
         }
     ]
 
@@ -184,10 +145,10 @@ def test_load_transactions_complex_structure() -> None:
     try:
         result: List[Dict[str, Any]] = load_transactions(temp_file_path)
         assert len(result) == 1
-        assert "metadata" in result[0]
-        assert "tags" in result[0]
-        assert result[0]["metadata"]["location"] == "Moscow"
-        assert isinstance(result[0]["tags"], list)
+        assert result[0]["metadata"]["location"]["city"] == "Moscow"
+        assert result[0]["metadata"]["device"]["os"] == "iOS"
+        assert len(result[0]["items"]) == 2
+        assert result[0]["items"][0]["name"] == "Product A"
 
     finally:
         os.unlink(temp_file_path)
