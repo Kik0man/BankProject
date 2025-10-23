@@ -68,3 +68,13 @@ for description in descriptions:
 for card in card_number_generator(1, 5):
     print(card)
 ```
+
+# Новый модуль работы с json и API
+
+## Модуль utils принимает на вход файл operations.json и получает данные
+
+## Модуль external_api сравнивает актуальный курс валют и производит конвертацию валюты
+
+## Тесты новых модулей
+
+### Для тестирования модулей были написаны тесты test_utils & test_external_api
