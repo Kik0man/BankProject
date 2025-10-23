@@ -55,7 +55,6 @@ def get_date(date_str: str) -> str:
         raise ValueError("Компоненты даты должны быть числами")
 
     # Проверяем валидность даты
-    year_int = int(year)
     month_int = int(month)
     day_int = int(day)
 
