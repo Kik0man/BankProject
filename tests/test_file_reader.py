@@ -1,10 +1,19 @@
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
+
 import pandas as pd
+
 from src.file_reader import read_csv_file, read_excel_file
 
 
 def test_read_csv_file_success() -> None:
-    """Тест успешного чтения CSV файла"""
+    """
+    Тестирует успешное чтение CSV файла с корректными данными.
+
+    Проверяет:
+    - Функция корректно читает данные из CSV
+    - Поля правильно преобразуются в нужные типы (amount в float)
+    - Возвращается ожидаемое количество транзакций
+    """
     csv_data = """id;state;date;amount;currency_name;currency_code;from;to;description
 650703;EXECUTED;2023-09-05T11:30:32Z;16210;Sol;PEN;Счет 58803664561298323391;
 Счет 39745660563456619397;Перевод организации"""
@@ -33,7 +42,15 @@ def test_read_csv_file_success() -> None:
 
 
 def test_read_excel_file_success() -> None:
-    """Тест успешного чтения Excel файла с pandas"""
+    """
+    Тестирует успешное чтение Excel файла с pandas.
+
+    Проверяет:
+    - Функция корректно обрабатывает DataFrame из pandas
+    - Все транзакции сохраняются без потерь
+    - Типы данных сохраняются правильно
+    - Поддерживаются различные форматы данных
+    """
     # Создаем реальный DataFrame для теста
     test_data = [
         {
@@ -78,7 +95,16 @@ def test_read_excel_file_success() -> None:
 
 
 def test_read_excel_file_empty() -> None:
-    """Тест чтения пустого Excel файла"""
+    """
+    Тестирует чтение пустого Excel файла.
+
+    Проверяет:
+    - Функция корректно обрабатывает пустой DataFrame
+    - Возвращается пустой список транзакций
+    - Отсутствуют ошибки при обработке пустых данных
+
+    Edge case: файл существует, но не содержит данных
+    """
     # Создаем пустой DataFrame
     empty_df = pd.DataFrame()
 
@@ -91,7 +117,15 @@ def test_read_excel_file_empty() -> None:
 
 
 def test_read_excel_file_with_empty_rows() -> None:
-    """Тест чтения Excel файла с пустыми строками"""
+    """
+    Тестирует чтение Excel файла с пустыми и частично заполненными строками.
+
+    Проверяет:
+    - Пустые строки корректно фильтруются
+    - Частично заполненные строки с отсутствующим id/state игнорируются
+    - Корректные строки сохраняются
+    - Фильтрация работает по наличию id и state
+    """
     test_data = [
         {"id": None, "state": None, "amount": None, "currency_name": None},  # Пустая строка
         {"id": "650703", "state": "EXECUTED", "amount": 16210, "currency_name": "Sol"},
@@ -113,7 +147,15 @@ def test_read_excel_file_with_empty_rows() -> None:
 
 
 def test_read_excel_file_with_string_amount() -> None:
-    """Тест чтения Excel файла с amount как строка"""
+    """
+    Тестирует чтение Excel файла с числовыми значениями в виде строк.
+
+    Проверяет:
+    - Строковые значения amount корректно конвертируются в float
+    - Числовые значения amount остаются числами
+    - Тип данных для amount всегда float после обработки
+    - Конвертация не ломает исходные данные
+    """
     test_data = [
         {"id": "650703", "state": "EXECUTED", "amount": "16210", "currency_name": "Sol"},
         {"id": "3598919", "state": "EXECUTED", "amount": 29740, "currency_name": "Peso"},
@@ -135,7 +177,14 @@ def test_read_excel_file_with_string_amount() -> None:
 
 
 def test_read_excel_file_not_found() -> None:
-    """Тест обработки отсутствующего Excel файла"""
+    """
+    Тестирует обработку ситуации когда Excel файл не существует.
+
+    Проверяет:
+    - Функция выбрасывает FileNotFoundError для отсутствующего файла
+    - Исключение имеет правильный тип
+    - Сообщение об ошибке содержит путь к файлу
+    """
     with patch("pandas.read_excel") as mock_read_excel:
         mock_read_excel.side_effect = FileNotFoundError("File not found")
 
@@ -149,7 +198,14 @@ def test_read_excel_file_not_found() -> None:
 
 
 def test_read_csv_file_not_found() -> None:
-    """Тест обработки отсутствующего CSV файла"""
+    """
+    Тестирует обработку ситуации когда CSV файл не существует.
+
+    Проверяет:
+    - Функция выбрасывает FileNotFoundError для отсутствующего файла
+    - Исключение перехватывается и обрабатывается правильно
+    - Не возникают другие неожиданные исключения
+    """
     try:
         read_csv_file("nonexistent_file.csv")
         assert False, "Ожидалось исключение FileNotFoundError"

@@ -1,6 +1,6 @@
-import pytest
-
 from typing import Any
+
+import pytest
 
 
 # Ниже идут фикстуры для проверки 3 модулей: masks.py \ processing.py \ widget.py

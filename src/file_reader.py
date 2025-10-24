@@ -1,13 +1,18 @@
 import csv
+from typing import Any, Dict, List, cast
+
 import pandas as pd
-from typing import List, Dict, Any, cast
 
 
 def read_csv_file(file_path: str) -> List[Dict[str, Any]]:
     """
     Читает финансовые операции из CSV файла
+
     Args:
         file_path: Путь к CSV файлу
+    Raises:
+        FileNotFoundError: Если указанный файл не существует
+        Exception: При других ошибках чтения файла или обработки данных
     """
     transactions: List[Dict[str, Any]] = []
 
@@ -44,8 +49,15 @@ def read_csv_file(file_path: str) -> List[Dict[str, Any]]:
 def read_excel_file(file_path: str) -> List[Dict[str, Any]]:
     """
     Читает финансовые операции из Excel файла с использованием pandas
+
     Args:
-        file_path: Путь к Excel файлу
+        file_path: Путь к Excel файлу (.xlsx, .xls)
+
+    Notes:
+        - Функция автоматически обрабатывает пустые ячейки (заменяет NaN на None)
+        - Пропускает строки, где отсутствует id или state
+        - Автоматически конвертирует поле amount в float
+        - Поддерживает форматы .xlsx и .xls
     """
     try:
         # Читаем Excel файл
