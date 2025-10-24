@@ -2,8 +2,7 @@ from typing import Any, Generator, Iterator
 
 
 def filter_by_currency(
-    transactions: list[dict[str, Any]],
-    currency_code: str = "USD"
+    transactions: list[dict[str, Any]], currency_code: str = "USD"
 ) -> Iterator[dict[str, Any]]:  # Убрать Optional
     """Фильтрует транзакции по валюте операции.
     Args:
