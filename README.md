@@ -78,3 +78,8 @@ for card in card_number_generator(1, 5):
 ## Тесты новых модулей
 
 ### Для тестирования модулей были написаны тесты test_utils & test_external_api
+
+
+# Новый модуль file-reader.py
+Он отвечает за чтение файлов форматов csv и excel
+функция read_csv_file отвечает за чтение csv файлов, а read_excel_file за excel файлы
