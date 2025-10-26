@@ -1,6 +1,5 @@
 import os
 from typing import Any, Dict, Optional
-from unittest.mock import patch
 
 import requests
 from dotenv import load_dotenv
@@ -19,18 +18,18 @@ def get_amount_in_rubles(transaction: Dict[str, Any]) -> Optional[float]:
             return None
 
         # Извлекаем сумму и валюту из реальной структуры operations.json
-        if 'operationAmount' not in transaction:
+        if "operationAmount" not in transaction:
             print("❌ Отсутствует поле 'operationAmount' в транзакции")
             return None
 
-        operation_amount = transaction['operationAmount']
+        operation_amount = transaction["operationAmount"]
 
         # Извлекаем сумму (она хранится как строка!)
-        if 'amount' not in operation_amount:
+        if "amount" not in operation_amount:
             print("❌ Отсутствует поле 'amount' в operationAmount")
             return None
 
-        amount_str = operation_amount['amount']
+        amount_str = operation_amount["amount"]
 
         # Конвертируем строку в число
         try:
@@ -44,30 +43,30 @@ def get_amount_in_rubles(transaction: Dict[str, Any]) -> Optional[float]:
             return None
 
         # Извлекаем валюту из вложенной структуры
-        if 'currency' not in operation_amount:
+        if "currency" not in operation_amount:
             print("❌ Отсутствует поле 'currency' в operationAmount")
             return None
 
-        currency_data = operation_amount['currency']
+        currency_data = operation_amount["currency"]
 
         # Обрабатываем структуру валюты (словарь с полями 'name' и 'code')
         if not isinstance(currency_data, dict):
             print(f"❌ Некорректный формат валюты: {type(currency_data)}")
             return None
 
-        if 'code' not in currency_data:
+        if "code" not in currency_data:
             print("❌ Отсутствует поле 'code' в currency")
             return None
 
-        currency = currency_data['code'].upper()
+        currency = currency_data["code"].upper()
 
         # Если валюта уже рубли, возвращаем как есть
-        if currency == 'RUB':
+        if currency == "RUB":
             return amount
 
         # Если валюта USD или EUR, конвертируем
-        if currency in ['USD', 'EUR']:
-            converted_amount = convert_currency_apilayer(amount, currency, 'RUB')
+        if currency in ["USD", "EUR"]:
+            converted_amount = convert_currency_apilayer(amount, currency, "RUB")
             if converted_amount is None:
                 print(f"❌ Не удалось конвертировать {amount} {currency} в RUB")
                 return None
@@ -88,7 +87,7 @@ def convert_currency_apilayer(amount: float, from_currency: str, to_currency: st
     """
     try:
         # Получаем API ключ из .env файла
-        api_key = os.getenv('EXCHANGE_RATE_API_KEY')
+        api_key = os.getenv("EXCHANGE_RATE_API_KEY")
 
         if not api_key:
             print("❌ API ключ не найден в .env файле")
@@ -97,7 +96,7 @@ def convert_currency_apilayer(amount: float, from_currency: str, to_currency: st
         # Формируем URL для получения текущих курсов
         url = f"https://api.apilayer.com/exchangerates_data/latest?base={from_currency}&symbols={to_currency}"
 
-        headers = {'apikey': api_key}
+        headers = {"apikey": api_key}
 
         # Отправляем GET запрос
         response = requests.get(url, headers=headers, timeout=10)
@@ -110,13 +109,13 @@ def convert_currency_apilayer(amount: float, from_currency: str, to_currency: st
         data = response.json()
 
         # Проверяем успешность ответа API
-        if not data.get('success', False):
-            error_info = data.get('error', {})
+        if not data.get("success", False):
+            error_info = data.get("error", {})
             print(f"❌ API ошибка: {error_info.get('info', 'Unknown error')}")
             return None
 
         # Получаем курс конвертации
-        rates = data.get('rates', {})
+        rates = data.get("rates", {})
         rate = rates.get(to_currency)
 
         if not rate:
@@ -142,5 +141,3 @@ def convert_currency_apilayer(amount: float, from_currency: str, to_currency: st
     except Exception as e:
         print(f"❌ Неожиданная ошибка в convert_currency_apilayer: {e}")
         return None
-
-

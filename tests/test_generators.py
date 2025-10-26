@@ -7,8 +7,8 @@ from src.generators import card_number_generator, filter_by_currency, transactio
 
 # Тесты для filter_by_currency
 def test_filter_usd_transactions(currency_test_transactions: list[dict[str, Any]]) -> None:
-    """Тестирование фильтрации USD транзакций. """
-    result: list[dict[str, Any]] = list(filter_by_currency(currency_test_transactions, "USD"))
+    """Тестирование фильтрации USD транзакций."""
+    result = list(filter_by_currency(currency_test_transactions, "USD"))
 
     assert len(result) == 3
     assert all(t["operationAmount"]["currency"]["code"] == "USD" for t in result)
@@ -18,7 +18,7 @@ def test_filter_usd_transactions(currency_test_transactions: list[dict[str, Any]
 
 def test_filter_rub_transactions(currency_test_transactions: list[dict[str, Any]]) -> None:
     """Тестирование фильтрации RUB транзакций."""
-    result: list[dict[str, Any]] = list(filter_by_currency(currency_test_transactions, "RUB"))
+    result = list(filter_by_currency(currency_test_transactions, "RUB"))
 
     assert len(result) == 2
     assert all(t["operationAmount"]["currency"]["code"] == "RUB" for t in result)
@@ -28,25 +28,28 @@ def test_filter_rub_transactions(currency_test_transactions: list[dict[str, Any]
 
 def test_filter_eur_transactions_empty(currency_test_transactions: list[dict[str, Any]]) -> None:
     """Тестирование фильтрации по отсутствующей валюте EUR."""
-    result: list[dict[str, Any]] = list(filter_by_currency(currency_test_transactions, "EUR"))
+    result = list(filter_by_currency(currency_test_transactions, "EUR"))
     assert result == []
 
 
 def test_filter_empty_transactions(empty_transactions_list: list[dict[str, Any]]) -> None:
     """Тестирование фильтрации пустого списка."""
-    result: list[dict[str, Any]] = list(filter_by_currency(empty_transactions_list, "USD"))
+    result = list(filter_by_currency(empty_transactions_list, "USD"))
     assert result == []
 
 
 def test_filter_transactions_without_currency(transactions_without_currency_info: list[dict[str, Any]]) -> None:
     """Тестирование фильтрации транзакций без информации о валюте."""
-    result: list[dict[str, Any]] = list(filter_by_currency(transactions_without_currency_info, "USD"))
+    result = list(filter_by_currency(transactions_without_currency_info, "USD"))
     assert result == []
 
 
 def test_currency_filter_generator_behavior(currency_test_transactions: list[dict[str, Any]]) -> None:
     """Тестирование поведения генератора фильтрации по валюте."""
-    generator: Iterator[dict[str, Any]] = filter_by_currency(currency_test_transactions, "USD")
+    generator = filter_by_currency(currency_test_transactions, "USD")
+
+    # Проверяем, что generator не None перед использованием
+    assert generator is not None
 
     # Первые три USD транзакции
     assert next(generator)["id"] == 939719570

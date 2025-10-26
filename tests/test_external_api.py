@@ -1,7 +1,6 @@
 from typing import Any, Dict
 from unittest.mock import Mock, patch
 
-
 from src.external_api import convert_currency_apilayer, get_amount_in_rubles
 
 

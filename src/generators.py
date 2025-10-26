@@ -1,10 +1,9 @@
-from typing import Any, Generator, Iterator, Optional
+from typing import Any, Generator, Iterator
 
 
 def filter_by_currency(
-    transactions: list[dict[str, Any]],
-    currency_code: str = "USD"
-) -> Iterator[Optional[dict[str, Any]]]:
+    transactions: list[dict[str, Any]], currency_code: str = "USD"
+) -> Iterator[dict[str, Any]]:  # Убрать Optional
     """Фильтрует транзакции по валюте операции.
     Args:
     transactions: список словарей с транзакциями
